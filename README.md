@@ -2,7 +2,9 @@
 
 Real-time speech-to-text with LLM-powered JSON extraction. Speak naturally and get structured data.
 
-## What It Does
+## Demo
+
+https://github.com/user-attachments/assets/demo.mov
 
 1. **Records** audio from your microphone
 2. **Transcribes** speech using Whisper (pywhispercpp)
