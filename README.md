@@ -1,188 +1,83 @@
-# Live Microphone to Whisper Transcription
+# Speech JSON Extractor
 
-A real-time speech-to-text application that captures live audio from your microphone and transcribes it using OpenAI's Whisper model.
+Real-time speech-to-text with LLM-powered JSON extraction. Speak naturally and get structured data.
 
-## Features
+## What It Does
 
-- 🎙️ **Real-time microphone capture** - Live audio recording from your microphone
-- 🎵 **Whisper transcription** - High-quality speech recognition using OpenAI Whisper
-- ⚡ **Low-latency processing** - 3-second audio chunks for near real-time transcription
-- 🔇 **Voice activity detection** - Automatically filters out silence
-- 💾 **Auto-save transcriptions** - All transcriptions saved to timestamped files
-- 🎛️ **Audio device selection** - Choose from available microphones
-- 🧵 **Multi-threaded processing** - Separate threads for recording and transcription
-- ✅ **Clean error handling** - Graceful handling of audio and transcription errors
+1. **Records** audio from your microphone
+2. **Transcribes** speech using Whisper (pywhispercpp)
+3. **Extracts** structured JSON using LLM (Gemma via LM Studio)
 
-## Quick Setup
+## Example
 
-1. **Run the setup script:**
-   ```bash
-   python setup.py
-   ```
+**You say:** "2 tomatoes, 3 onions, and 1 chicken"
 
-2. **Activate the virtual environment:**
-   ```bash
-   source speech_env/bin/activate
-   ```
+**Output:**
+```json
+{"items": [{"name": "tomatoes", "quantity": 2}, {"name": "onions", "quantity": 3}, {"name": "chicken", "quantity": 1}]}
+```
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Quick Start
 
-4. **Run the live transcription:**
-   ```bash
-   python main.py
-   ```
+```bash
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-## Manual Setup (Alternative)
+# Install dependencies
+pip install -r requirements.txt
 
-If you prefer to set up manually:
+# Run
+python main.py
+```
 
-1. **Create virtual environment:**
-   ```bash
-   python3 -m venv speech_env
-   source speech_env/bin/activate
-   ```
+Press `Ctrl+C` to stop recording.
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Requirements
 
-## Usage
+- Python 3.10+
+- macOS (Apple Silicon recommended) / Linux
+- LM Studio running locally with Gemma model
+- Microphone access
 
-1. **Start the application:**
-   ```bash
-   python main.py
-   ```
+### Install PortAudio (for PyAudio)
 
-2. **Select audio device** (optional):
-   - The app will list all available microphones
-   - By default, it uses your system's default microphone
-   - To use a specific device, modify the `device_index` in the code
-
-3. **Start speaking:**
-   - The app will capture and transcribe your speech in real-time
-   - Transcriptions appear with timestamps
-   - Processing time is shown for each transcription
-
-4. **Stop and save:**
-   - Press `Ctrl+C` to stop recording
-   - All transcriptions are automatically saved to a timestamped text file
-
-## Configuration Options
-
-### Whisper Model Sizes
-You can change the model in `main.py`:
-- `tiny` - Fastest, least accurate (~39 MB)
-- `base` - Good balance, default (~74 MB)
-- `small` - Better accuracy (~244 MB)
-- `medium` - High accuracy (~769 MB)
-- `large` - Best accuracy, slowest (~1550 MB)
-
-### Audio Settings
-- **Sample Rate**: 16kHz (optimal for Whisper)
-- **Channels**: Mono (single channel)
-- **Chunk Duration**: 3 seconds (configurable)
-- **Audio Format**: 16-bit PCM
-
-### Voice Activity Detection
-- Automatically filters out silent audio chunks
-- Adjustable volume threshold in the code
-- Prevents transcription of background noise
-
-## System Requirements
-
-- **Python 3.7+**
-- **macOS, Linux, or Windows**
-- **Microphone access**
-- **Internet connection** (for initial Whisper model download)
-- **Audio drivers** (PortAudio for PyAudio)
-
-### macOS Installation Notes
-If you encounter PyAudio installation issues on macOS:
+**macOS:**
 ```bash
 brew install portaudio
-pip install pyaudio
 ```
 
-### Linux Installation Notes
-If you encounter PyAudio installation issues on Linux:
+**Linux:**
 ```bash
-sudo apt-get install portaudio19-dev python3-pyaudio
-pip install pyaudio
+sudo apt-get install portaudio19-dev
 ```
 
-## Output Files
+## Configuration
 
-Transcriptions are automatically saved as:
-- **Filename**: `transcription_YYYYMMDD_HHMMSS.txt`
-- **Format**: Timestamped text with processing times
-- **Location**: Same directory as the script
+Edit `main.py` to change:
+- `INPUT_DEVICE_INDEX` - Your microphone index
+- `RATE` - Sample rate (default: 16000)
 
-## Troubleshooting
+Edit `text_transcription.py` to change:
+- `url` - LM Studio API endpoint
+- `model` - LLM model name
 
-### Common Issues
+## Project Structure
 
-1. **PyAudio installation errors**:
-   - Install PortAudio system dependency first
-   - Use appropriate package manager for your OS
-
-2. **No microphone detected**:
-   - Check microphone permissions
-   - Verify microphone is not in use by other applications
-   - Try running with different audio device index
-
-3. **Slow transcription**:
-   - Use a smaller Whisper model (tiny or base)
-   - Reduce chunk duration
-   - Ensure sufficient system resources
-
-4. **Poor transcription quality**:
-   - Use a larger Whisper model (medium or large)
-   - Improve microphone quality/positioning
-   - Reduce background noise
-
-### Performance Tips
-
-- **CPU Usage**: Larger models require more processing power
-- **Memory**: Ensure sufficient RAM for model loading
-- **Real-time Factor**: Aim for transcription time < chunk duration
-- **Audio Quality**: Use a good microphone for better results
-
-## Advanced Usage
-
-### Custom Audio Device
-```python
-# List devices first to find the index
-transcriber.list_audio_devices()
-
-# Use specific device
-transcriber.start_recording(device_index=2)
+```
+├── main.py                    # Main recording loop
+├── audio_transcription_v2.py  # Whisper transcription
+├── text_transcription.py      # LLM JSON extraction
+└── requirements.txt           # Dependencies
 ```
 
-### Adjust Processing Parameters
-```python
-# Create with different settings
-transcriber = LiveWhisperTranscriber(
-    model_size="small",     # Better accuracy
-    chunk_duration=5.0      # Longer chunks for context
-)
-```
+## How It Works
 
-## Technical Details
-
-- **Audio Processing**: 16-bit PCM at 16kHz sample rate
-- **Threading**: Separate threads for recording and transcription
-- **Queue Management**: Thread-safe audio and transcription queues
-- **Overlap Processing**: 50% overlap between audio chunks for continuity
-- **Error Recovery**: Graceful handling of audio stream interruptions
+1. Records 3-second audio chunks
+2. Sends to Whisper for transcription
+3. Sends transcription to LLM for JSON extraction
+4. Displays results in real-time
 
 ## License
 
-This project uses OpenAI's Whisper model under MIT license.
-
-## Contributing
-
-Feel free to submit issues and enhancement requests!
+MIT
