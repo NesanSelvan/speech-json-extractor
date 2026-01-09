@@ -1,0 +1,12 @@
+huggingface-hub
+faster-whisper
+psutil
+transformers
+
+torch
+accelerate
+hf_transfer
+pyaudio
+streamlit
+
+pywhispercpp
