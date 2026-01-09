@@ -2,14 +2,6 @@
 
 Real-time speech-to-text with LLM-powered JSON extraction. Speak naturally and get structured data.
 
-## Demo
-
-https://github.com/user-attachments/assets/demo.mov
-
-1. **Records** audio from your microphone
-2. **Transcribes** speech using Whisper (pywhispercpp)
-3. **Extracts** structured JSON using LLM (Gemma via LM Studio)
-
 ## Example
 
 **You say:** "2 tomatoes, 3 onions, and 1 chicken"
